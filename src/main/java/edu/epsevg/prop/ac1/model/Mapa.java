@@ -210,6 +210,40 @@ public class Mapa {
         // ===============================================
         //@TODO: A IMPLEMENTAR !!!!!!
         // ===============================================
+        
+        /*comprovacions necessaries:
+            -paret, espai, sortida, claus, agents, portes
+        */
+        
+        for (int i = 0; i < agents.size(); i++){
+            Posicio posAgent = agents.get(i);
+            for (Direccio dir: Direccio.values()){
+                Posicio pos = posAgent;
+                pos = pos.translate(dir);
+                int celda = this.getCell(pos);
+                boolean noAgent = true;
+                boolean portaObrible = true;
+                
+                if (celda == -1) continue; //comprovacio de PARET
+                //comprovació de que no hi ha altres agents a la celda a on es pot moure
+                int e = 0;
+                while (noAgent && e<agents.size()){
+                    if (e != i && agents.get(e).equals(pos)) noAgent = false;
+                    else e++;
+                }
+                //comprovació portes
+                if (Character.isUpperCase(celda) && !this.portaObrible((char) celda) ){
+                    portaObrible = false;
+                }
+                
+                //se puede mover //2 opciones-> (movimiento a una clave o a un espacio vacio)
+                if (noAgent && portaObrible && (celda == 0 || celda == -2 || Character.isLowerCase((char) celda) || Character.isUpperCase((char) celda) ) ){ 
+                    //es una clave y no la hemos recogido
+                    if (Character.isLowerCase((char) celda) && !this.teClau((char) celda)) res.add(new Moviment(i+1, dir, true));
+                    else res.add(new Moviment(i+1, dir, false));
+                }      
+            }
+        }
         return res;
     }
 
@@ -228,8 +262,24 @@ public class Mapa {
         // ===============================================
         //@TODO: A IMPLEMENTAR !!!!!!
         // ===============================================
+        if (this == o) return true;
+        if (!(o instanceof Mapa)) return false;
+        Mapa other = (Mapa) o;
+        if (this.getN()!=other.getN() || this.getM()!=other.getM()) return false;
+        boolean iguals = true;
         
-        return true;
+        for (int i = 0; i < n; i++){
+            for (int j = 0; j < m; j++){
+                if (this.grid[i][j] != other.getCell(new Posicio(i,j))){
+                    iguals = false;
+                    break;
+                }
+            }
+        }
+        if ( !(this.agents.equals(other.agents)) ) return false;
+        if (this.getClausMask() != other.getClausMask()) return false;
+        
+        return iguals;
     }
 
     @Override
@@ -237,8 +287,11 @@ public class Mapa {
         // ===============================================
         //@TODO: A IMPLEMENTAR !!!!!!
         // ===============================================
-        
-        return 0;
+        int result = Objects.hash(n, m, clausMask, agents);
+        // Agregamos el contenido de grid
+        result = 31 * result + Arrays.deepHashCode(grid);
+        return result;
+
     }
 
     @Override
