@@ -1,5 +1,6 @@
 package edu.epsevg.prop.ac1;
 //holaCarlos
+//cambio2
 import edu.epsevg.prop.ac1.cerca.*;
 import edu.epsevg.prop.ac1.cerca.heuristica.HeuristicaAvancada;
 import edu.epsevg.prop.ac1.cerca.heuristica.HeuristicaBasica;
