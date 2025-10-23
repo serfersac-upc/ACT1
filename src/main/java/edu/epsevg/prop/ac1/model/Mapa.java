@@ -218,7 +218,7 @@ public class Mapa {
         for (int i = 0; i < agents.size(); i++){
             Posicio posAgent = agents.get(i);
             for (Direccio dir: Direccio.values()){
-                Posicio pos = posAgent;
+                Posicio pos = new Posicio(posAgent.x, posAgent.y);
                 pos = pos.translate(dir);
                 int celda = this.getCell(pos);
                 boolean noAgent = true;
@@ -316,5 +316,19 @@ public class Mapa {
     //===================================================================
     
     //@TODO: (opcionalment) el que cregueu convenient per ampliar la classe.
+    
+    public List<Posicio> PosicionsClaus (){
+        List<Posicio> posClaus = new ArrayList<>();
+        for (int i=0; i<n; i++){
+            for (int j=0; j<m; j++){
+                if (Character.isLowerCase(grid[i][j]) ) posClaus.addLast(new Posicio(i,j));
+            }
+        }
+        return posClaus;
+    }
+    
+    public void setSortida(Posicio p){
+        this.sortida = p;
+    }
 
 }

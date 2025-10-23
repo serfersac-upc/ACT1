@@ -30,7 +30,6 @@ public class CercaBFS extends Cerca {
         while(!LNO.isEmpty() && !fin){
             Node actual = LNO.poll();
             rc.incNodesExplorats();
-            rc.updateMemoria(LNO.size() + LNT.size());
             if (actual.estat.esMeta()){
                 fin = true;
                 rc.setCami(reconstruirCami(actual));
@@ -38,7 +37,7 @@ public class CercaBFS extends Cerca {
             else{
                 List <Moviment> ListaMovimientos = new ArrayList<>(actual.estat.getAccionsPossibles());
                 for (Moviment mov: ListaMovimientos){ //añado todos los mapas a partir de los movimientos posibles
-                    Mapa movido = actual.estat.mou(mov); 
+                    Mapa movido = new Mapa(actual.estat.mou(mov)); 
                     if (!LNT.contains(movido)){
                         LNT.add(movido);
                         LNO.add(new Node(movido, actual, mov, actual.depth+1, actual.g+1) ); 
@@ -50,19 +49,9 @@ public class CercaBFS extends Cerca {
             }
 
         }
-        
+        rc.updateMemoria(LNO.size() + LNT.size());
     }
     
     
-    private List<Moviment> reconstruirCami(Node node){
-        List<Moviment> cami = new ArrayList<>();
-        Node actual = node;
-        while (actual.pare != null){
-            cami.add(actual.accio);
-            actual = actual.pare;
-        }
-        Collections.reverse(cami);
-        return cami;
-    }
    
 }
