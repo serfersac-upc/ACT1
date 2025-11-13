@@ -21,11 +21,12 @@ public class CercaBFS extends Cerca {
         boolean fin = false;
         
         Queue<Node> LNO = new LinkedList<>();
-        Set<Mapa> LNT = new HashSet<>();
+        Set<Mapa> LNT = null;
+        if (usarLNT) LNT = new HashSet<>();
         
         Node NodeInicial = new Node(inicial, null, null, 0, 0);
         LNO.add(NodeInicial);
-        LNT.add(inicial);
+        if (usarLNT) LNT.add(inicial);
         
         while(!LNO.isEmpty() && !fin){
             Node actual = LNO.poll();
@@ -37,19 +38,25 @@ public class CercaBFS extends Cerca {
             else{
                 List <Moviment> ListaMovimientos = new ArrayList<>(actual.estat.getAccionsPossibles());
                 for (Moviment mov: ListaMovimientos){ //añado todos los mapas a partir de los movimientos posibles
-                    Mapa movido = new Mapa(actual.estat.mou(mov)); 
-                    if (!LNT.contains(movido)){
-                        LNT.add(movido);
-                        LNO.add(new Node(movido, actual, mov, actual.depth+1, actual.g+1) ); 
+                    Mapa movido = new Mapa(actual.estat.mou(mov));
+                    if (usarLNT){
+                        if (!LNT.contains(movido)){
+                            LNT.add(movido);
+                            LNO.add(new Node(movido, actual, mov, actual.depth+1, actual.g+1) ); 
+                            rc.updateMemoria(LNO.size()+LNT.size());
+                        }
+                        else{
+                            rc.incNodesTallats();
+                        }
                     }
-                    else{
-                        rc.incNodesTallats();
+                    if (!usarLNT){
+                            LNO.add(new Node(movido, actual, mov, actual.depth+1, actual.g+1) ); 
+                            rc.updateMemoria(LNO.size());
                     }
                 }
             }
 
         }
-        rc.updateMemoria(LNO.size() + LNT.size());
     }
     
     

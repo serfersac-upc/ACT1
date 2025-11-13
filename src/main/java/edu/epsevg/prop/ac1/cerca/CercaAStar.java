@@ -27,7 +27,11 @@ public class CercaAStar extends Cerca {
     public  void ferCerca(Mapa inicial, ResultatCerca rc) {
         boolean solucio = false;
         
-        Queue<Node> LNO = new PriorityQueue<>();
+        Queue<Node> LNO = new PriorityQueue<>( (node1, node2) ->{ 
+            int f1 = node1.g+heur.h(node1.estat);
+            int f2 = node2.g+heur.h(node2.estat);
+            return Integer.compare(f1,f2);
+        });
         Map<Mapa, Integer> LNT = new HashMap<>();
                         //estat| pare|accio |depth|  g
         LNO.add(new Node(inicial, null, null, 0, 0));
@@ -40,21 +44,20 @@ public class CercaAStar extends Cerca {
             LNT.put(actual.estat, actual.g);
             if (actual.estat.esMeta()){
                 solucio = true;
-                rc.setCami(reconstruirCami(actual));       
+                rc.setCami(reconstruirCami(actual));
             }
             
             else{            
                 List<Moviment> movimientos = actual.estat.getAccionsPossibles();
                 for (Moviment mov: movimientos){
                     //creando nodo
-                    Mapa movido = new Mapa(actual.estat.mou(mov));
-                    movido.setSortida(actual.estat.getSortidaPosicio());
-                    int h = heur.h(movido);
+                    Mapa movido = actual.estat.mou(mov); 
                     int nouG = actual.g+1;
                     if (!LNT.containsKey(movido)){// nodo repetido
                         LNT.put(movido, nouG);
                         Node node = new Node(movido, actual, mov, actual.depth + 1,nouG);
                         LNO.add(node);
+                        rc.updateMemoria(LNO.size()+LNT.size());
                     }
                     else {
                         int costAnt = LNT.get(movido);
@@ -62,13 +65,17 @@ public class CercaAStar extends Cerca {
                             LNT.put(movido, nouG);
                             Node node = new Node(movido, actual, mov, actual.depth + 1,nouG);
                             LNO.add(node);
+                            rc.updateMemoria(LNO.size()+LNT.size());
                         }
-                        else rc.incNodesTallats();
+                        else {
+                            rc.incNodesTallats();
+                            rc.updateMemoria(LNO.size()+LNT.size());
+                        }
                     }
                 }
             }
 
         }
-        rc.updateMemoria(LNO.size()+LNT.size());
+
     }
 }

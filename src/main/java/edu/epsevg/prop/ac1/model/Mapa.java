@@ -40,13 +40,15 @@ public class Mapa {
     /**
      * Constructor a partir d'un arxiu
      */
-    public Mapa(Path fitxer) throws IOException {
+public Mapa(Path fitxer) throws IOException {
         List<String> lines = Files.readAllLines(fitxer);
         this.n = lines.size();
         this.m = lines.get(0).length();
         this.grid = new int[n][m];
         this.agents = new ArrayList<>();
         this.clausMask = 0;
+        
+        HashMap<Integer, Posicio> posicioAgent = new HashMap<>();
         
         sortida = null;
         
@@ -61,7 +63,8 @@ public class Mapa {
                     default:
                         if (Character.isDigit(c)) {
                             // posem l'agent, però __NO__ es situa a la graella
-                            agents.add(new Posicio(i, j));
+                            //agents.add(new Posicio(i, j));
+                            posicioAgent.put(c-'0', new Posicio(i, j));
                             grid[i][j] = ESPAI;
                         } else if (Character.isLowerCase(c)) {
                             grid[i][j] = c; // desem directament la lletra
@@ -73,6 +76,12 @@ public class Mapa {
                 }
             }
         }
+        for(int i=1;i<=posicioAgent.size();i++) {
+            Posicio p = posicioAgent.get(i);
+            if(p==null) throw new RuntimeException("Mapa no vàlid: id's d'agents han de ser correlatius i començar per 1.");
+            agents.add(p);
+        }
+        
         if(sortida==null) throw new RuntimeException("Sortida no definida.");
         if(agents.size()==0) throw new RuntimeException("Agents no definits.");
     }
@@ -90,6 +99,7 @@ public class Mapa {
         this.agents = new ArrayList<>();
         for (Posicio p : other.agents) this.agents.add(new Posicio(p.x, p.y));
         this.clausMask = other.clausMask;
+        this.sortida = other.sortida; // LINIA AFEGIDA !
     }
 
     /**
